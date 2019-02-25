@@ -1,14 +1,17 @@
 const expect = require('expect')
 const supertest = require('supertest')
+const {ObjectID} = require('mongodb')
 
-const {app} = require('./../server')
-const {Todo} = require('./../models/todo')
+const {app} = require('./../../server/server')
+const {Todo} = require('./../../server/models/todo')
 
 const todos = [
   {
-    text: 'Test 1'
+    _id: new ObjectID(),
+    text: 'Create my blog'
   }, {
-    text: 'Test 2'
+    _id: new ObjectID(),
+    text: 'Take a break to have lunch'
   }
 ]
 
@@ -35,9 +38,9 @@ describe('POST /todos', function () {
     supertest(app)
       .post('/todos')
       .send(todo)
-      .expect(200)
+      .expect(201)
       .expect(function (res) {
-        expect(res.body.text).toBe(todo.text)
+        expect(res.body.createdTodo.text).toBe(todo.text)
       })
       .end(function (err, res) {
         if (err)
@@ -83,7 +86,7 @@ describe('POST /todos', function () {
 })
 
 describe('GET /todos', function () {
-  it('should get all todos', function (done) {
+  it('should return all todos', function (done) {
     supertest(app)
       .get('/todos')
       .expect(200)
@@ -91,5 +94,37 @@ describe('GET /todos', function () {
         expect(res.body.todos.length).toBe(2)
       })
       .end(done)
+  })
+})
+
+describe('GET /todos/:id', function () {
+  it('should return todo by its id', function (done) {
+    const firstTodo = todos[0]
+
+    supertest(app)
+    .get(`/todos/${firstTodo._id.toHexString()}`)
+    .expect(200)
+    .expect(function (res) {
+      expect(res.body.todo.text).toBe(firstTodo.text)
+    })
+    .end(done)
+  })
+
+  it('should return 404 if not found', function (done) {
+    const unusedId = new ObjectID()
+
+    supertest(app)
+    .get(`/todos/${unusedId}`)
+    .expect(404)
+    .end(done)
+  })
+
+  it('should return 400 if id is invalid', function (done) {
+    const invalidId = new ObjectID().toHexString() + 'abc'
+
+    supertest(app)
+    .get(`/todos/${invalidId}`)
+    .expect(400)
+    .end(done)
   })
 })

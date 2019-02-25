@@ -2,6 +2,7 @@
 
 const express = require('express')
 const bodyParser = require('body-parser')
+const {ObjectID} = require('mongodb')
 
 const {mongoose} = require('./db/mongoose')
 const {Todo} = require('./models/todo')
@@ -27,8 +28,12 @@ app.post('/todos', function (req, res) {
 
   todo
     .save()
-    .then(function (doc) {
-      res.send(doc)
+    .then(function (createdTodo) {
+      res
+        .status(201)
+        .send({
+          createdTodo
+        })
     })
     .catch(function (err) {
       res.status(500).send(err)
@@ -40,9 +45,33 @@ app.get('/todos', function (req, res) {
   Todo
     .find()
     .then(function (todos) {
-      res.send({
-        todos
-      })
+      res
+        .status(200)
+        .send({
+          todos
+        })
+    })
+    .catch(function (err) {
+      res.status(500).send(err)
+    })
+})
+
+// get "/todos" endpoint to get a Todo by its id
+app.get('/todos/:id', function (req, res) {
+  if (ObjectID.isValid(req.params.id) == false)
+    return res.status(400).send('Bad Request')
+
+  Todo
+    .findById(req.params.id)
+    .then(function (todo) {
+      if (!todo)
+        return res.status(404).send('Not Found')
+
+      res
+        .status(200)
+        .send({
+          todo
+        })
     })
     .catch(function (err) {
       res.status(500).send(err)
