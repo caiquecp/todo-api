@@ -11,7 +11,9 @@ const todos = [
     text: 'Create my blog'
   }, {
     _id: new ObjectID(),
-    text: 'Take a break to have lunch'
+    text: 'Take a break to have lunch',
+    completed: true,
+    completedAt: new Date().getTime()
   }
 ]
 
@@ -130,7 +132,7 @@ describe('GET /todos/:id', function () {
 })
 
 describe('DELETE /todos/:id', function () {
-  it('should delete, and return the deleted todo, by its id', function (done) {
+  it('should delete and return the deleted todo', function (done) {
     const firstTodo = todos[0]
 
     supertest(app)
@@ -170,6 +172,46 @@ describe('DELETE /todos/:id', function () {
     supertest(app)
     .delete(`/todos/${invalidId}`)
     .expect(400)
+    .end(done)
+  })
+})
+
+describe('PATCH /todos/:id', function () {
+  it('should update (text and completed to true) and return the updated todo', function (done) {
+    const firstTodo = todos[0]
+    const dataToUpdate = {
+      text: `${firstTodo.text} (updated)`,
+      completed: true
+    }
+
+    supertest(app)
+    .patch(`/todos/${firstTodo._id.toHexString()}`)
+    .send(dataToUpdate)
+    .expect(200)
+    .expect(function (res) {
+      expect(res.body.updatedTodo.text).toBe(dataToUpdate.text)
+      expect(res.body.updatedTodo.completed).toBeTruthy()
+      expect(typeof res.body.updatedTodo.completedAt).toBe('number')
+    })
+    .end(done)
+  })
+
+  it('should clear completedAt when todo is not completed', function (done) {
+    const secondTodo = todos[1]
+    const dataToUpdate = {
+      text: `${secondTodo.text} (updated)`,
+      completed: false
+    }
+
+    supertest(app)
+    .patch(`/todos/${secondTodo._id.toHexString()}`)
+    .send(dataToUpdate)
+    .expect(200)
+    .expect(function (res) {
+      expect(res.body.updatedTodo.text).toBe(dataToUpdate.text)
+      expect(res.body.updatedTodo.completed).toBeFalsy()
+      expect(res.body.updatedTodo.completedAt).toBe(null)
+    })
     .end(done)
   })
 })

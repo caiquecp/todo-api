@@ -2,11 +2,9 @@
 
 const express = require('express')
 const bodyParser = require('body-parser')
-const {ObjectID} = require('mongodb')
 
+// connects to mongodb
 const {mongoose} = require('./db/mongoose')
-const {Todo} = require('./models/todo')
-const {User} = require('./models/user')
 
 // declaring port through environment variables (to work in different environments)
 const port = process.env.PORT || 3000
@@ -17,88 +15,8 @@ const app = express()
 // set body-parser as middleware for json
 app.use(bodyParser.json())
 
-// post "/todos" endpoint to create a new Todo
-app.post('/todos', function (req, res) {
-  if (!req.body.text)
-    return res.status(400).send('Bad Request')
-
-  const todo = new Todo({
-    text: req.body.text
-  })  
-
-  todo
-    .save()
-    .then(function (createdTodo) {
-      res
-        .status(201)
-        .send({
-          createdTodo
-        })
-    })
-    .catch(function (err) {
-      res.status(500).send(err)
-    })
-})
-
-// get "/todos" endpoint to get all Todos
-app.get('/todos', function (req, res) {
-  Todo
-    .find()
-    .then(function (todos) {
-      res
-        .status(200)
-        .send({
-          todos
-        })
-    })
-    .catch(function (err) {
-      res.status(500).send(err)
-    })
-})
-
-// get "/todos" endpoint to get a Todo by its id
-app.get('/todos/:id', function (req, res) {
-  if (ObjectID.isValid(req.params.id) == false)
-    return res.status(400).send('Bad Request')
-
-  Todo
-    .findById(req.params.id)
-    .then(function (todo) {
-      if (!todo)
-        return res.status(404).send('Not Found')
-
-      res
-        .status(200)
-        .send({
-          todo
-        })
-    })
-    .catch(function (err) {
-      res.status(500).send(err)
-    })
-})
-
-// delete "/todos" endpoint to delete a Todo by its id
-app.delete('/todos/:id', function (req, res) {
-  if (ObjectID.isValid(req.params.id) == false)
-    return res.status(400).send('Bad Request')
-
-  Todo
-    .findByIdAndDelete(req.params.id)
-    .then(function (deletedTodo) {
-      if (!deletedTodo)
-        return res.status(404).send('Not Found')
-
-      res
-        .status(200)
-        .send({
-          deletedTodo
-        })
-    })
-    .catch(function (err) {
-      res.status(500).send(err)
-    })
-})
+// create routes
+const todoRoutes = require('./routes/todo')(app)
 
 // start listening to requests
 app.listen(port, function () {
