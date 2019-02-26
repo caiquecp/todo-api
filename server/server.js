@@ -78,6 +78,28 @@ app.get('/todos/:id', function (req, res) {
     })
 })
 
+// delete "/todos" endpoint to delete a Todo by its id
+app.delete('/todos/:id', function (req, res) {
+  if (ObjectID.isValid(req.params.id) == false)
+    return res.status(400).send('Bad Request')
+
+  Todo
+    .findByIdAndDelete(req.params.id)
+    .then(function (deletedTodo) {
+      if (!deletedTodo)
+        return res.status(404).send('Not Found')
+
+      res
+        .status(200)
+        .send({
+          deletedTodo
+        })
+    })
+    .catch(function (err) {
+      res.status(500).send(err)
+    })
+})
+
 // start listening to requests
 app.listen(port, function () {
   console.log(`Server is running on port ${port}`)

@@ -30,7 +30,7 @@ beforeEach(function (done) {
 })
 
 describe('POST /todos', function () {
-  it('should create a new todo', function (done) {
+  it('should create a new todo and return it', function (done) {
     const todo = {
       text: 'Test todo text'
     }
@@ -124,6 +124,51 @@ describe('GET /todos/:id', function () {
 
     supertest(app)
     .get(`/todos/${invalidId}`)
+    .expect(400)
+    .end(done)
+  })
+})
+
+describe('DELETE /todos/:id', function () {
+  it('should delete, and return the deleted todo, by its id', function (done) {
+    const firstTodo = todos[0]
+
+    supertest(app)
+    .delete(`/todos/${firstTodo._id.toHexString()}`)
+    .expect(200)
+    .expect(function (res) {
+      expect(res.body.deletedTodo.text).toBe(firstTodo.text)
+    })
+    .end(function (err, res) {
+      if (err)
+          return done(err)
+
+      Todo
+        .findById(firstTodo._id.toHexString())
+        .then(function (todo) {
+          expect(todo).toBeNull()
+          done()
+        })
+        .catch(function (err) {
+          done(err)
+        })
+    })
+  })
+
+  it('should return 404 if not found', function (done) {
+    const unusedId = new ObjectID()
+
+    supertest(app)
+    .delete(`/todos/${unusedId}`)
+    .expect(404)
+    .end(done)
+  })
+
+  it('should return 400 if id is invalid', function (done) {
+    const invalidId = new ObjectID().toHexString() + 'abc'
+
+    supertest(app)
+    .delete(`/todos/${invalidId}`)
     .expect(400)
     .end(done)
   })
