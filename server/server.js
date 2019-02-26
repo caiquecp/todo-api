@@ -8,7 +8,7 @@ const {mongoose} = require('./db/mongoose')
 const {Todo} = require('./models/todo')
 const {User} = require('./models/user')
 
-// declaring port through environment variables
+// declaring port through environment variables (to work in different environments)
 const port = process.env.PORT || 3000
 
 // create an Express app

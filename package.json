@@ -1,14 +1,17 @@
 {
   "name": "todo-api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "A simple TODO API",
+  "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
     "test": "mocha tests/**/*.test.js",
     "test-watch": "nodemon --exec 'npm test'"
   },
-  "author": "",
+  "engines": {
+    "node": "10.15.1"
+  },
+  "author": "Caique C Pereira",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
