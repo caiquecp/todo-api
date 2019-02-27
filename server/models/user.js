@@ -1,9 +1,11 @@
 'use strict'
 
+const _ = require('lodash')
 const mongoose = require('mongoose')
 const validator = require('validator')
+const jwt = require('jsonwebtoken')
 
-const User = mongoose.model('User', {
+const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     require: true,
@@ -24,14 +26,43 @@ const User = mongoose.model('User', {
     access: {
       type: String,
       require: true
-    }
-  }, {
+    },
     token: {
       type: String,
       require: true
     }
   }]
 })
+
+UserSchema.methods.toJSON = function () {
+  const user = this
+  const userObject = user.toObject()
+
+  return _.pick(userObject, ['_id', 'email'])
+}
+
+UserSchema.methods.generateAuthToken = function () {
+  const user = this
+  const access = 'auth'
+
+  const token = jwt.sign({
+    _id: user._id.toHexString(),
+    access
+  }, 'abc@123').toString()
+
+  user.tokens = user.tokens.concat([{
+    access,
+    token
+  }])
+
+  return user
+    .save()
+    .then(function () {
+      return token
+    })
+}
+
+const User = mongoose.model('User', UserSchema)
 
 module.exports = {
   User

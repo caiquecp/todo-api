@@ -14,11 +14,15 @@ module.exports = function (app) {
 
     user
       .save()
-      .then(function (createdUser) {
+      .then(function () {
+        return user.generateAuthToken()
+      })
+      .then(function (token) {
         res
+          .header('x-auth', token)
           .status(201)
           .send({
-            createdUser
+            createdUser: user
           })
       })
       .catch(function (err) {
