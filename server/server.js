@@ -20,6 +20,7 @@ app.use(bodyParser.json())
 
 // create routes
 const todoRoutes = require('./routes/todo')(app)
+const userRoutes = require('./routes/user')(app)
 
 // start listening to requests
 app.listen(port, function () {

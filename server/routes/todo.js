@@ -8,9 +8,7 @@ module.exports = function (app) {
     if (!req.body.text)
       return res.status(400).send('Bad Request')
 
-    const todo = new Todo({
-      text: req.body.text
-    })  
+    const todo = new Todo(_.pick(req.body, ['text']))  
 
     todo
       .save()

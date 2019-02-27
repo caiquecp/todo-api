@@ -5,8 +5,7 @@ const {ObjectID} = require('mongodb')
 const {app} = require('./../../server/server')
 const {Todo} = require('./../../server/models/todo')
 
-const todos = [
-  {
+const todos = [{
     _id: new ObjectID(),
     text: 'Create my blog'
   }, {
@@ -14,8 +13,7 @@ const todos = [
     text: 'Take a break to have lunch',
     completed: true,
     completedAt: new Date().getTime()
-  }
-]
+  }]
 
 beforeEach(function (done) {
   Todo
