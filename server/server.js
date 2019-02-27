@@ -1,5 +1,8 @@
 'use strict'
 
+// server configurations, environment and etc.
+require('./config/config')
+
 const express = require('express')
 const bodyParser = require('body-parser')
 
@@ -7,7 +10,7 @@ const bodyParser = require('body-parser')
 const {mongoose} = require('./db/mongoose')
 
 // declaring port through environment variables (to work in different environments)
-const port = process.env.PORT || 3000
+const port = process.env.PORT
 
 // create an Express app
 const app = express()

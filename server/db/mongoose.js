@@ -7,7 +7,7 @@ mongoose.Promise = global.Promise
 
 mongoose.set('useFindAndModify', false)
 
-const mongoDBURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/TodoApp'
+const mongoDBURI = process.env.MONGODB_URI
 
 // connect to mongodb
 mongoose.connect(mongoDBURI, { useNewUrlParser: true })
